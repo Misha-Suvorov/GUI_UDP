@@ -6,3 +6,8 @@ gst-launch-1.0 udpsrc port=5601 ! tsparse ! tsdemux ! h264parse ! avdec_h264 ! v
 
 
 C:\Users\ASUS>gst-launch-1.0 ksvideosrc ! videoconvert ! video/x-raw,format=I420,width=640,height=480,framerate=30/1 ! x264enc tune=zerolatency bitrate=500 ! rtph264pay config-interval=1 pt=96 ! udpsink host=127.0.0.1 port=5601
+
+
+
+
+sudo apt update && sudo apt install qtcreator qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools qt6-qmake-bin qt6-qpa-plugins qt6-shader-baker qt6-declarative-dev qt6-multimedia-dev qt6-connectivity-dev qt6-networkauth-dev qt6-3d-dev qt6-sensors-dev qt6-positioning-dev qt6-quick3d-dev qt6-svg-dev qt6-imageformats-plugins qt6-wayland-dev qt6-webview-dev qt6-webengine-dev qt6-websockets-dev qt6-dbus-dev qt6-mqtt-dev qt6-serialport-dev qt6-remoteobjects-dev qt6-scxml-dev qt6-lottie-dev qt6-translations-dev qt6-tools-static qt6-tools-private-dev -y
