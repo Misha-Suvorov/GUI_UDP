@@ -9,43 +9,9 @@ C:\Users\ASUS>gst-launch-1.0 ksvideosrc ! videoconvert ! video/x-raw,format=I420
 
 
 
+sudo apt update
+sudo apt install -y gstreamer1.0-tools gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly \
+                    gstreamer1.0-plugins-good gstreamer1.0-plugins-base gstreamer1.0-libav \
+                    gstreamer1.0-nvvideo4linux2
 
-#include <opencv2/opencv.hpp>
-#include <iostream>
-
-int main(int argc, char *argv[]) {
-    std::string videoFile = "input.mp4"; // Change this to your video file path
-    
-    cv::VideoCapture cap(videoFile);
-    if (!cap.isOpened()) {
-        std::cerr << "Error: Could not open video file." << std::endl;
-        return -1;
-    }
-
-    int width = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH));
-    int height = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT));
-    int fps = static_cast<int>(cap.get(cv::CAP_PROP_FPS));
-
-    std::string pipeline = "appsrc ! videoconvert ! video/x-raw, format=NV12 ! "
-                           "mpph265enc ! rtph265pay config-interval=1 ! "
-                           "udpsink host=192.168.144.100 port=5600";
-
-    cv::VideoWriter writer(pipeline, 0, fps, cv::Size(width, height), true);
-    
-    if (!writer.isOpened()) {
-        std::cerr << "Error: Could not open GStreamer pipeline." << std::endl;
-        return -1;
-    }
-    
-    cv::Mat frame;
-    while (cap.read(frame)) {
-        writer.write(frame);
-        cv::imshow("Streaming", frame);
-        if (cv::waitKey(1) == 27) break; // Press 'ESC' to exit
-    }
-
-    cap.release();
-    writer.release();
-    cv::destroyAllWindows();
-    return 0;
-}
+gst-inspect-1.0 nvv4l2h265enc
