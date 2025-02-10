@@ -10,4 +10,42 @@ C:\Users\ASUS>gst-launch-1.0 ksvideosrc ! videoconvert ! video/x-raw,format=I420
 
 
 
-sudo apt update && sudo apt install qtcreator qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools qt6-qmake-bin qt6-qpa-plugins qt6-shader-baker qt6-declarative-dev qt6-multimedia-dev qt6-connectivity-dev qt6-networkauth-dev qt6-3d-dev qt6-sensors-dev qt6-positioning-dev qt6-quick3d-dev qt6-svg-dev qt6-imageformats-plugins qt6-wayland-dev qt6-webview-dev qt6-webengine-dev qt6-websockets-dev qt6-dbus-dev qt6-mqtt-dev qt6-serialport-dev qt6-remoteobjects-dev qt6-scxml-dev qt6-lottie-dev qt6-translations-dev qt6-tools-static qt6-tools-private-dev -y
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+int main(int argc, char *argv[]) {
+    std::string videoFile = "input.mp4"; // Change this to your video file path
+    
+    cv::VideoCapture cap(videoFile);
+    if (!cap.isOpened()) {
+        std::cerr << "Error: Could not open video file." << std::endl;
+        return -1;
+    }
+
+    int width = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH));
+    int height = static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT));
+    int fps = static_cast<int>(cap.get(cv::CAP_PROP_FPS));
+
+    std::string pipeline = "appsrc ! videoconvert ! video/x-raw, format=NV12 ! "
+                           "mpph265enc ! rtph265pay config-interval=1 ! "
+                           "udpsink host=192.168.144.100 port=5600";
+
+    cv::VideoWriter writer(pipeline, 0, fps, cv::Size(width, height), true);
+    
+    if (!writer.isOpened()) {
+        std::cerr << "Error: Could not open GStreamer pipeline." << std::endl;
+        return -1;
+    }
+    
+    cv::Mat frame;
+    while (cap.read(frame)) {
+        writer.write(frame);
+        cv::imshow("Streaming", frame);
+        if (cv::waitKey(1) == 27) break; // Press 'ESC' to exit
+    }
+
+    cap.release();
+    writer.release();
+    cv::destroyAllWindows();
+    return 0;
+}
